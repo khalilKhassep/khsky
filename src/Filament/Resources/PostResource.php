@@ -35,6 +35,7 @@ use Illuminate\Support\Str;
 use LaraZeus\Sky\Filament\Resources\PostResource\Pages;
 use LaraZeus\Sky\Models\Post;
 use LaraZeus\Sky\SkyPlugin;
+use Filament\Tables\Columns\TextColumn;
 
 // @mixin Builder<PostScope>
 class PostResource extends SkyResource
@@ -182,6 +183,9 @@ class PostResource extends SkyResource
                     ->label(__('Post Tags'))
                     ->toggleable(isToggledHiddenByDefault: true)
                     ->type('tag'),
+                TextColumn::make('panels.panel_name')
+                    ->label(__('Panel')),
+
 
                 SpatieTagsColumn::make('category')
                     ->label(__('Post Category'))

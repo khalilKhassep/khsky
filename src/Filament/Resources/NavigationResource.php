@@ -8,6 +8,7 @@ use Filament\Forms\Components\Section;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\View;
 use Filament\Forms\Components\ViewField;
+use Filament\Forms\Components\Select;
 use Filament\Forms\Form;
 use Filament\Forms\Set;
 use Filament\Tables\Actions\DeleteAction;
@@ -29,7 +30,7 @@ class NavigationResource extends SkyResource
 
     public static function disableTimestamps(bool $condition = true): void
     {
-        static::$showTimestamps = ! $condition;
+        static::$showTimestamps = !$condition;
     }
 
     public static function form(Form $form): Form
@@ -41,13 +42,13 @@ class NavigationResource extends SkyResource
                         ->label(__('zeus-sky::filament-navigation.attributes.name'))
                         ->reactive()
                         ->debounce()
-                        ->afterStateUpdated(function (?string $state, Set $set) {
-                            if (! $state) {
-                                return;
-                            }
+                        // ->afterStateUpdated(function (?string $state, Set $set) {
+                        //     if (!$state) {
+                        //         return;
+                        //     }
 
-                            $set('handle', Str::slug($state));
-                        })
+                        //     $set('handle', Str::slug($state));
+                        // })
                         ->required(),
                     ViewField::make('items')
                         ->label(__('zeus-sky::filament-navigation.attributes.items'))
@@ -60,10 +61,13 @@ class NavigationResource extends SkyResource
                     ]),
                 Group::make([
                     Section::make('')->schema([
-                        TextInput::make('handle')
-                            ->label(__('zeus-sky::filament-navigation.attributes.handle'))
-                            ->required()
-                            ->unique(column: 'handle', ignoreRecord: true),
+                        Select::make('handle')
+                            ->label(__('Location'))
+                            ->options([
+                                'main-header-menu' =>  __('Header menu'),
+                            ])
+                            ->required(),
+                            //->unique(column: 'handle', ignoreRecord: true),
                         View::make('zeus::filament.card-divider')
                             ->visible(static::$showTimestamps),
                         Placeholder::make('created_at')
@@ -117,6 +121,9 @@ class NavigationResource extends SkyResource
                     ->label(__('zeus-sky::filament-navigation.attributes.updated_at'))
                     ->dateTime()
                     ->sortable(),
+                TextColumn::make('panels.panel_name')
+                    ->label(__('Panel')),
+
             ])
             ->actions([
                 EditAction::make()
@@ -124,9 +131,7 @@ class NavigationResource extends SkyResource
                 DeleteAction::make()
                     ->icon(null),
             ])
-            ->filters([
-
-            ]);
+            ->filters([]);
     }
 
     public static function getPages(): array

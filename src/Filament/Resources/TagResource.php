@@ -71,6 +71,9 @@ class TagResource extends SkyResource
                             ? $record->{$record->type}()->count()
                             : 0
                     ),
+                TextColumn::make('panels.panel_name')
+                    ->label(__('Panel')),
+
             ])
             ->filters([
                 SelectFilter::make('type')

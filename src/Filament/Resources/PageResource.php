@@ -2,39 +2,40 @@
 
 namespace LaraZeus\Sky\Filament\Resources;
 
-use Filament\Forms\Components\DateTimePicker;
-use Filament\Forms\Components\Hidden;
-use Filament\Forms\Components\Placeholder;
-use Filament\Forms\Components\Select;
-use Filament\Forms\Components\SpatieMediaLibraryFileUpload;
-use Filament\Forms\Components\Tabs;
-use Filament\Forms\Components\Textarea;
-use Filament\Forms\Components\TextInput;
-use Filament\Forms\Components\ToggleButtons;
-use Filament\Forms\Form;
 use Filament\Forms\Get;
 use Filament\Forms\Set;
+use Filament\Forms\Form;
+use Filament\Tables\Table;
+use Illuminate\Support\Str;
+use LaraZeus\Sky\SkyPlugin;
+use LaraZeus\Sky\Models\Post;
+use Filament\Forms\Components\Tabs;
 use Filament\Tables\Actions\Action;
+use Filament\Tables\Filters\Filter;
+use Filament\Forms\Components\Hidden;
+use Filament\Forms\Components\Select;
+use Filament\Forms\Components\Textarea;
+use Filament\Tables\Actions\EditAction;
+use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Columns\ViewColumn;
+use Filament\Forms\Components\TextInput;
 use Filament\Tables\Actions\ActionGroup;
 use Filament\Tables\Actions\DeleteAction;
-use Filament\Tables\Actions\DeleteBulkAction;
-use Filament\Tables\Actions\EditAction;
-use Filament\Tables\Actions\ForceDeleteAction;
-use Filament\Tables\Actions\ForceDeleteBulkAction;
-use Filament\Tables\Actions\RestoreAction;
-use Filament\Tables\Actions\RestoreBulkAction;
-use Filament\Tables\Columns\ViewColumn;
-use Filament\Tables\Filters\Filter;
 use Filament\Tables\Filters\SelectFilter;
-use Filament\Tables\Filters\TrashedFilter;
-use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
+use Filament\Forms\Components\Placeholder;
+use Filament\Tables\Actions\RestoreAction;
+use Filament\Tables\Filters\TrashedFilter;
+use Filament\Forms\Components\ToggleButtons;
+use Filament\Forms\Components\DateTimePicker;
+use Filament\Tables\Actions\DeleteBulkAction;
+use Filament\Tables\Actions\ForceDeleteAction;
+use Filament\Tables\Actions\RestoreBulkAction;
+use Filament\Tables\Actions\ForceDeleteBulkAction;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
-use Illuminate\Support\Str;
 use LaraZeus\Sky\Filament\Resources\PageResource\Pages;
-use LaraZeus\Sky\Models\Post;
-use LaraZeus\Sky\SkyPlugin;
-
+use Filament\Forms\Components\SpatieMediaLibraryFileUpload;
+use App\Models\Scopes\PanelScope;
 class PageResource extends SkyResource
 {
     protected static ?string $slug = 'pages';
@@ -56,6 +57,7 @@ class PageResource extends SkyResource
         return parent::getEloquentQuery()
             ->withoutGlobalScopes([
                 SoftDeletingScope::class,
+                PanelScope::class,
             ]);
     }
 
@@ -142,7 +144,7 @@ class PageResource extends SkyResource
                     SpatieMediaLibraryFileUpload::make('featured_image_upload')
                         ->collection('pages')
                         ->disk(SkyPlugin::get()->getUploadDisk())
-                        ->directory(SkyPlugin::get()->getUploadDirectory())
+                        ->directory(SkyPlugin::get()->getUploadDirectory().'kh')
                         ->visible(fn (Get $get) => $get('featured_image_type') === 'upload')
                         ->label(''),
                     TextInput::make('featured_image')
@@ -152,6 +154,12 @@ class PageResource extends SkyResource
                 ]),
             ])->columnSpan(2),
         ]);
+    }
+
+    protected function mutateFormDataBeforeFill(array $data): array
+    {
+          dd($data);
+        return $data;
     }
 
     public static function table(Table $table): Table
@@ -172,6 +180,9 @@ class PageResource extends SkyResource
                     ->toggleable()
                     ->view('zeus::filament.columns.status-desc')
                     ->tooltip(fn (Post $record): string => $record->published_at->format('Y/m/d | H:i A')),
+                TextColumn::make('panels.panel_name')
+                    ->label(__('Panel')),
+
             ])
             ->defaultSort('id', 'desc')
             ->actions(static::getActions())

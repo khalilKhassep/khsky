@@ -146,6 +146,9 @@ class LibraryResource extends SkyResource
                     ->label(__('Library Tags'))
                     ->toggleable()
                     ->type('library'),
+                TextColumn::make('panels.panel_name')
+                    ->label(__('Panel')),
+
             ])
             ->actions(static::getActions())
             ->filters([

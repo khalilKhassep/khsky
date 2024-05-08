@@ -79,6 +79,9 @@ class FaqResource extends SkyResource
                     ->label(__('FAQ Categories'))
                     ->toggleable()
                     ->type('faq'),
+                TextColumn::make('panels.panel_name')
+                    ->label(__('Panel')),
+
             ])
             ->filters([
                 SelectFilter::make('tags')
