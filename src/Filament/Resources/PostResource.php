@@ -2,6 +2,7 @@
 
 namespace LaraZeus\Sky\Filament\Resources;
 
+use Filament\Forms\Components\Checkbox;
 use Filament\Forms\Components\DateTimePicker;
 use Filament\Forms\Components\Hidden;
 use Filament\Forms\Components\Placeholder;
@@ -12,6 +13,10 @@ use Filament\Forms\Components\Tabs;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\ToggleButtons;
+use Filament\Forms\Components\Repeater;
+use Filament\Forms\Components\Section;
+use Filament\Forms\Components\Toggle;
+
 use Filament\Forms\Form;
 use Filament\Forms\Get;
 use Filament\Forms\Set;
@@ -36,7 +41,8 @@ use LaraZeus\Sky\Filament\Resources\PostResource\Pages;
 use LaraZeus\Sky\Models\Post;
 use LaraZeus\Sky\SkyPlugin;
 use Filament\Tables\Columns\TextColumn;
-
+use Guava\FilamentIconPicker\Forms\IconPicker;
+use App\Filament\Resources\PostResource\RelationManagers\PostMetaRelationManager;
 // @mixin Builder<PostScope>
 class PostResource extends SkyResource
 {
@@ -68,6 +74,19 @@ class PostResource extends SkyResource
                         }),
                     config('zeus-sky.editor')::component()
                         ->label(__('Post Content')),
+
+                     Select::make('google_form_id')
+                     ->relationship(name:'form' , titleAttribute:'name')
+                     ->preload(),
+
+                    Repeater::make('post_meta')
+                        ->relationship()
+                        ->schema([
+                            TextInput::make('key'),
+                            TextInput::make('value'),
+                            IconPicker::make('icon')
+                        ])
+
                 ]),
 
                 Tabs\Tab::make(__('SEO'))->schema([
@@ -87,7 +106,7 @@ class PostResource extends SkyResource
                         ->hint(__('Write an excerpt for your post')),
 
                     TextInput::make('slug')
-                        ->unique(ignorable: fn (?Post $record): ?Post => $record)
+                        ->unique(ignorable: fn(?Post $record): ?Post => $record)
                         ->required()
                         ->maxLength(255)
                         ->label(__('Post Slug')),
@@ -114,7 +133,7 @@ class PostResource extends SkyResource
 
                     TextInput::make('password')
                         ->label(__('Password'))
-                        ->visible(fn (Get $get): bool => $get('status') === 'private'),
+                        ->visible(fn(Get $get): bool => $get('status') === 'private'),
 
                     DateTimePicker::make('published_at')
                         ->label(__('published at'))
@@ -146,19 +165,80 @@ class PostResource extends SkyResource
                         ->default('upload'),
                     SpatieMediaLibraryFileUpload::make('featured_image_upload')
                         ->collection('posts')
+                        ->responsiveImages()
+                        ->live()
+                        ->manipulations([
+                            'thumb' => ['widht' => 300 , 'height' => 300]
+                        ])
                         ->disk(SkyPlugin::get()->getUploadDisk())
                         ->directory(SkyPlugin::get()->getUploadDirectory())
-                        ->visible(fn (Get $get) => $get('featured_image_type') === 'upload')
+                        ->visible(fn(Get $get) => $get('featured_image_type') === 'upload')
                         ->label(''),
 
                     TextInput::make('featured_image')
                         ->label(__('featured image url'))
-                        ->visible(fn (Get $get) => $get('featured_image_type') === 'url')
+                        ->visible(fn(Get $get) => $get('featured_image_type') === 'url')
                         ->url(),
+
+                    Section::make()
+                        ->label(__('Thumbnail'))
+                        ->schema([
+                            SpatieMediaLibraryFileUpload::make('thumbnail_upload')
+                                ->label(__('Thumbnail'))
+                                ->collection('thumbnail')
+                                ->disk(SkyPlugin::get()->getUploadDisk())
+                                ->directory(SkyPlugin::get()->getUploadDirectory())
+                                ->live()
+                                ->afterStateHydrated(function ($state, ?\LaraZeus\Sky\Models\Post $record, Get $get, Set $set, string $operation) {
+                                    // state is null on create , empty array on edit 
+                                   // do clear thubnail collection when adding a custom thubnail 
+
+                                    $has_thmb = $get('has_thumb') === null ? false : $get('has_thumb');
+
+                                    // dd($state, $record);
+
+                                    if($operation === 'edit') {}
+                                    if($operation === 'create'){}
+
+                                  
+
+                                    if(is_null($state) || empty($state) && is_null($record) || !$has_thmb) {
+                                       
+                                        $has_thmb = $has_thmb;
+                                    }
+
+                                    if(!is_null($state) && is_array($state) && !empty($state) && !$has_thmb) {
+                                      // has thumb
+                                    //      if(!is_null($record)) {
+                                    //         if($record->has_thumb) {
+                                    //             // get media url 
+                                    //             $media = $record->getMedia('posts')[0]->getPath('thumb-cropped-original');
+                                                
+                                               
+                                                
+                                    //         }
+                                    // }
+                                    
+                                        $has_thmb = true;
+                                    }
+
+                                    // dd($has_thmb);
+
+                                    $set('has_thumb', $has_thmb);
+                                    
+                                    //dd($state, $operation , $record);
+                        }),
+                        Checkbox::make('has_thumb')
+                        ->label('Has thmbnail')
+                        ->required()
+                    ])
+
+                        
                 ]),
             ])->columnSpan(2),
         ]);
     }
+
 
     public static function table(Table $table): Table
     {
@@ -265,6 +345,12 @@ class PostResource extends SkyResource
     public static function getNavigationBadge(): ?string
     {
         return (string) SkyPlugin::get()->getModel('Post')::posts()->count();
+    }
+
+    public static function getRelations(): array {
+        return [
+            PostMetaRelationManager::class
+        ];
     }
 
     public static function getActions(): array

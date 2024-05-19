@@ -11,7 +11,10 @@ class EditPost extends EditRecord
     use EditRecord\Concerns\Translatable;
 
     protected static string $resource = PostResource::class;
-
+ 
+    // protected function mutateFormDataBeforeSave(array $data): array {
+    //     dd($data);
+    // }
     protected function getHeaderActions(): array
     {
         return [

@@ -36,6 +36,7 @@ use Illuminate\Database\Eloquent\SoftDeletingScope;
 use LaraZeus\Sky\Filament\Resources\PageResource\Pages;
 use Filament\Forms\Components\SpatieMediaLibraryFileUpload;
 use App\Models\Scopes\PanelScope;
+use Filament\Forms\Components\Toggle;
 class PageResource extends SkyResource
 {
     protected static ?string $slug = 'pages';
@@ -75,6 +76,10 @@ class PageResource extends SkyResource
                             $set('slug', Str::slug($state));
                         }),
                     config('zeus-sky.editor')::component(),
+
+                    Select::make('google_form_id')
+                        ->relationship(name: 'form', titleAttribute: 'name')
+                        ->preload(),
                 ]),
                 Tabs\Tab::make(__('SEO'))->schema([
                     Hidden::make('user_id')
@@ -156,12 +161,7 @@ class PageResource extends SkyResource
         ]);
     }
 
-    protected function mutateFormDataBeforeFill(array $data): array
-    {
-          dd($data);
-        return $data;
-    }
-
+    
     public static function table(Table $table): Table
     {
         return $table

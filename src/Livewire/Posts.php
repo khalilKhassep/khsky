@@ -13,14 +13,22 @@ class Posts extends Component
     {
         $search = request('search');
         $category = request('category');
+        $type = str_replace('/', '', request()->getRequestUri());
+       
+        
+        if ($type === 'content' || $type == 'blog') 
+            $type = 'post';
+        
 
-        $posts = config('zeus-sky.models.Post')::NotSticky()
+        $posts = config('zeus-sky.models.Post')::NotSticky($type)
             ->search($search)
             ->with(['tags', 'author', 'media'])
+            ->type($type)
             ->forCategory($category)
-            ->published()
+            ->published($type)
             ->orderBy('published_at', 'desc')
             ->get();
+
 
         $pages = config('zeus-sky.models.Post')::query()
             ->page()

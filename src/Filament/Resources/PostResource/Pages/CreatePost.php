@@ -4,13 +4,13 @@ namespace LaraZeus\Sky\Filament\Resources\PostResource\Pages;
 
 use Filament\Actions\LocaleSwitcher;
 use Filament\Resources\Pages\CreateRecord;
-use Illuminate\Database\Eloquent\Model;
 use LaraZeus\Sky\Filament\Resources\PostResource;
-use Filament\Facades\Filament;
-use App\Models\Panel;
+use App\Traits\HasMultiablePanels;
 class CreatePost extends CreateRecord
 {
-    use CreateRecord\Concerns\Translatable;
+    use CreateRecord\Concerns\Translatable,HasMultiablePanels{
+        HasMultiablePanels::handleRecordCreation insteadof CreateRecord\Concerns\Translatable;
+    }
 
     protected static string $resource = PostResource::class;
 
@@ -21,16 +21,5 @@ class CreatePost extends CreateRecord
         ];
     }
 
-    protected function handleRecordCreation(array $data): Model
-    {
-        // attach cereated record to panel
-
-        $panel = Panel::findByName(Filament::getCurrentPanel()->getId());
-
-        $record = static::getModel()::create($data) ;
-
-        $panel->posts()->attach($record->id);
-
-        return $record ;
-    }
+   
 }

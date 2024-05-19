@@ -16,6 +16,8 @@ use Spatie\MediaLibrary\HasMedia;
 use Spatie\MediaLibrary\InteractsWithMedia;
 use Spatie\Tags\HasTags;
 use Spatie\Translatable\HasTranslations;
+use App\Models\PostMeta;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 /**
  * @property string $title
@@ -47,6 +49,7 @@ class Post extends Model implements HasMedia
         'title',
         'content',
         'description',
+       
     ];
 
     protected $fillable = [
@@ -63,11 +66,13 @@ class Post extends Model implements HasMedia
         'password',
         'ordering',
         'status',
+        'has_thumb'
     ];
 
     protected $casts = [
         'published_at' => 'datetime',
         'sticky_until' => 'datetime',
+       
     ];
 
     protected static function newFactory(): PostFactory
@@ -99,7 +104,10 @@ class Post extends Model implements HasMedia
     {
         return $this->belongsTo(self::class, 'parent_id', 'id');
     }
-
+    public function post_meta(): HasMany
+    {
+        return $this->hasMany(PostMeta::class, 'post_id', 'id');
+    }
     public function image(string $collection = 'posts'): Collection | string | null
     {
         if (! $this->getMedia($collection)->isEmpty()) {

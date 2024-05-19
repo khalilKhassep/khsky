@@ -26,7 +26,7 @@ Route::domain(config('zeus-sky.domain'))
         if (in_array('library', config('zeus-sky.uri'))) {
             Route::prefix(config('zeus-sky.uri.library'))
                 ->group(function () {
-                    Route::get('/', Library::class)->name('library');
+                    Route::get('/', Library::class)->name('library')->middleware('auth');
                     Route::get('/tag/{slug}', LibraryTag::class)->name('library.tag');
                     Route::get('/{slug}', LibraryItem::class)->name('library.item');
                 });

@@ -9,9 +9,9 @@ trait PostScope
     /**
      * @param  Builder<Post>  $query
      */
-    public function scopeSticky(Builder $query): Builder
+    public function scopeSticky(Builder $query , string $type = 'post'): Builder
     {
-        return $query->where('post_type', 'post')
+        return $query->where('post_type', $type)
             ->whereNotNull('sticky_until')
             ->whereDate('sticky_until', '>=', now())
             ->whereDate('published_at', '<=', now());
@@ -20,9 +20,9 @@ trait PostScope
     /**
      * @param  Builder<Post>  $query
      */
-    public function scopeNotSticky(Builder $query): Builder
+    public function scopeNotSticky(Builder $query , string $type = 'post'): Builder
     {
-        return $query->where('post_type', 'post')->where(function ($q) {
+        return $query->where('post_type', $type)->where(function ($q) {
             return $q->whereDate('sticky_until', '<=', now())->orWhereNull('sticky_until');
         })
             ->whereDate('published_at', '<=', now());
@@ -31,9 +31,9 @@ trait PostScope
     /**
      * @param  Builder<Post>  $query
      */
-    public function scopePublished(Builder $query): Builder
+    public function scopePublished(Builder $query , string $type = 'post'): Builder
     {
-        return $query->where('post_type', 'post')
+        return $query->where('post_type', $type)
             ->where('status', 'publish')
             ->whereDate('published_at', '<=', now());
     }
@@ -41,9 +41,9 @@ trait PostScope
     /**
      * @param  Builder<Post>  $query
      */
-    public function scopeRelated(Builder $query, Post $post): Builder
+    public function scopeRelated(Builder $query, Post $post , string $type = 'post'): Builder
     {
-        return $query->where('post_type', 'post')
+        return $query->where('post_type', $type)
             ->withAnyTags($post->tags->pluck('name')->toArray(), 'category');
     }
 
@@ -55,6 +55,39 @@ trait PostScope
         return $query->where('post_type', 'page');
     }
 
+    public function scopeEvent(Builder $builder) : Builder {
+        return $builder->where('post_type', 'event');
+    }
+
+
+    public function scopeAdministration(Builder $builder) : Builder {
+        return $builder->where('post_type', 'administration');
+    }
+
+    public function scopePartner(Builder $builder) :Builder {
+        return $builder->where('post_type', 'partner');
+    } 
+
+    function scopeService(Builder $builder) : Builder {
+        return $builder->where('post_type', 'service');
+    }
+    function scopeProduct(Builder $builder): Builder
+    {
+        return $builder->where('post_type', 'product');
+    }
+    function scopeActivites(Builder $builder): Builder
+    {
+        return $builder->where('post_type', 'activity');
+    }
+    function scopeHalls(Builder $builder): Builder
+    {
+        return $builder->where('post_type', 'hall');
+    }
+
+    function scopeType(Builder $builder ,string $type = 'post') : Builder {
+        
+        return $builder->where('post_type', $type);
+    }
     /**
      * @param  Builder<Post>  $query
      */
