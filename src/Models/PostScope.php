@@ -95,6 +95,21 @@ trait PostScope
     {
         return $query->where('post_type', 'post');
     }
+    public function scopeSommod(Builder $query, $load = true): Builder
+    {
+       
+        if ($load) {
+            
+            return $query->whereHas('panels', function ($query) {
+                return $query->where('panels.panel_id', 'sommod');
+            });
+        }
+
+        return $query->whereHas('panels', function ($query) {
+            return $query->where('panels.panel_id', 'admin');
+        });
+
+    }
 
     /**
      * @param  Builder<Post>  $query

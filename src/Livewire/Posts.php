@@ -11,9 +11,21 @@ class Posts extends Component
 
     public function render(): View
     {
+       // dd(isset(request()->query()['p']) && request()->query()['p'] == 'sommod');
+        $type = null;
+        $load = false;
+        if(isset(request()->query()['p']) && request()->query()['p'] =='sommod') {
+            $load = true;
+            $type = preg_replace('([?].*)', '', request()->getRequestUri());
+        } 
+
+       
+
+        
+
         $search = request('search');
         $category = request('category');
-        $type = str_replace('/', '', request()->getRequestUri());
+        $type = str_replace('/', '', !is_null($type) ? $type : request()->getRequestUri());
        
         
         if ($type === 'content' || $type == 'blog') 
@@ -21,6 +33,7 @@ class Posts extends Component
         
 
         $posts = config('zeus-sky.models.Post')::NotSticky($type)
+            ->sommod($load)
             ->search($search)
             ->with(['tags', 'author', 'media'])
             ->type($type)
@@ -29,8 +42,10 @@ class Posts extends Component
             ->orderBy('published_at', 'desc')
             ->get();
 
+      
 
         $pages = config('zeus-sky.models.Post')::query()
+            ->sommod($load)
             ->page()
             ->whereDate('published_at', '<=', now())
             ->search($search)
@@ -44,6 +59,7 @@ class Posts extends Component
         $posts = $this->highlightSearchResults($posts, $search);
 
         $recent = config('zeus-sky.models.Post')::query()
+            ->sommod($load)
             ->posts()
             ->published()
             ->whereDate('published_at', '<=', now())

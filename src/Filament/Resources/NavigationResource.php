@@ -35,6 +35,7 @@ class NavigationResource extends SkyResource
 
     public static function form(Form $form): Form
     {
+       
         return $form
             ->schema([
                 Section::make('')->schema([
@@ -42,13 +43,6 @@ class NavigationResource extends SkyResource
                         ->label(__('zeus-sky::filament-navigation.attributes.name'))
                         ->reactive()
                         ->debounce()
-                        // ->afterStateUpdated(function (?string $state, Set $set) {
-                        //     if (!$state) {
-                        //         return;
-                        //     }
-
-                        //     $set('handle', Str::slug($state));
-                        // })
                         ->required(),
                     ViewField::make('items')
                         ->label(__('zeus-sky::filament-navigation.attributes.items'))
@@ -65,6 +59,7 @@ class NavigationResource extends SkyResource
                             ->label(__('Location'))
                             ->options([
                                 'main-header-menu' =>  __('Header menu'),
+                                'main-sommod-header-menu' =>  __('Header menu Sommod'),
                             ])
                             ->required(),
                             //->unique(column: 'handle', ignoreRecord: true),
@@ -101,6 +96,11 @@ class NavigationResource extends SkyResource
     public static function getNavigationLabel(): string
     {
         return __('Navigations');
+    }
+
+    public static function canAccess(): bool
+    {
+        return filament()->getCurrentPanel()->getId() === 'admin';
     }
 
     public static function table(Table $table): Table
