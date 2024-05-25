@@ -60,6 +60,7 @@ class Tag extends \Spatie\Tags\Tag
     {
         $locale = $locale ?? static::getLocale();
 
+
         return static::query()
             ->where("slug->{$locale}", $slug)
             ->where('type', $type)

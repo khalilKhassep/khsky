@@ -35,7 +35,7 @@ class NavigationResource extends SkyResource
 
     public static function form(Form $form): Form
     {
-       
+
         return $form
             ->schema([
                 Section::make('')->schema([
@@ -60,6 +60,9 @@ class NavigationResource extends SkyResource
                             ->options([
                                 'main-header-menu' =>  __('Header menu'),
                                 'main-sommod-header-menu' =>  __('Header menu Sommod'),
+                                'footer-menu-1' =>  __('Footer 1'),
+                                'footer-menu-2' =>  __('Footer 2'),
+                                'footer-menu-3' =>  __('Footer 3'),
                             ])
                             ->required(),
                             //->unique(column: 'handle', ignoreRecord: true),

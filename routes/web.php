@@ -18,10 +18,10 @@ Route::domain(config('zeus-sky.domain'))
     ->prefix(config('zeus-sky.prefix'))
     ->group(function () {
 
-        if (in_array('faq', config('zeus-sky.uri'))) {
-            Route::get(config('zeus-sky.uri.faq'), Faq::class)
-                ->name('faq');
-        }
+        // if (in_array('faq', config('zeus-sky.uri'))) {
+        //     Route::get(config('zeus-sky.uri.faq'), Faq::class)
+        //         ->name('faq');
+        // }
 
         if (in_array('library', config('zeus-sky.uri'))) {
             Route::prefix(config('zeus-sky.uri.library'))
