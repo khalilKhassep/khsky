@@ -34,9 +34,9 @@ trait Configuration
         'hall' => 'Hall',
         'activity' => 'Activity',
         'administration' => 'Administration',
-        'event' => 'Event',
+
         'partner' => 'Partner',
-        'gallary' => 'Gallary',
+        'gallary' => 'Gallary'
 
     ];
 
