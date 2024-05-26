@@ -157,11 +157,22 @@ class PageResource extends SkyResource
                         ->visible(fn (Get $get) => $get('featured_image_type') === 'url')
                         ->url(),
                 ]),
+                Tabs\Tab::make(__('Attachment'))
+                ->schema([
+                    SpatieMediaLibraryFileUpload::make('attachments')
+                    ->label(__('Attachments'))
+                    ->acceptedFileTypes(['application/msword','application/pdf' , 'text/plain'])
+                    ->multiple()
+                    ->preserveFilenames()
+                    ->collection('attachments')
+                    ->directory('attachments')
+                    ->dehydrated(false)
+                ])
             ])->columnSpan(2),
         ]);
     }
 
-    
+
     public static function table(Table $table): Table
     {
         return $table
