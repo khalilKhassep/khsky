@@ -50,9 +50,8 @@ class TagResource extends SkyResource
                                              : false
                                              ;
                                 if ($tagModel) {
-                                    // dd(SkyPlugin::get()->getModel('Tag')::findBySlug($slug , 'faq'));
                                     $incementalslug = $state . '-' . SkyPlugin::get()->getModel('Tag')::where('slug', 'like', '%' . Str::slug($state) . '%')
-                                        ->where('type', 'faq')
+                                        //->where('type', 'faq')
                                         ->get()->count() + 1;
 
                                     $set('slug', Str::slug($incementalslug));

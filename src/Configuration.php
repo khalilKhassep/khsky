@@ -27,13 +27,17 @@ trait Configuration
         'category' => 'Category',
         'library' => 'Library',
         'faq' => 'Faq',
-        'study' => 'Study',
-        'cource' => 'Cource',
+        //'study' => 'Study',
+        //'cource' => 'Cource',
         'product' => 'Product',
         'service' => 'Service',
         'hall' => 'Hall',
-        'activity' => 'Activity'
-      
+        'activity' => 'Activity',
+        'administration' => 'Administration',
+        'event' => 'Event',
+        'partner' => 'Partner',
+        'gallary' => 'Gallary',
+
     ];
 
     protected array $hiddenResources = [];
