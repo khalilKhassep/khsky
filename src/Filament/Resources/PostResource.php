@@ -243,7 +243,9 @@ class PostResource extends SkyResource
                 ->schema([
                     SpatieMediaLibraryFileUpload::make('attachments')
                     ->label(__('Attachments'))
-                    ->acceptedFileTypes(['pdf','doc'])
+                    ->acceptedFileTypes(['application/msword','application/pdf' , 'text/plain'])
+                    ->multiple()
+                    ->preserveFilenames()
                     ->collection('attachments')
                     ->directory('attachments')
                     ->dehydrated(false)
