@@ -37,10 +37,10 @@ class Tag extends \Spatie\Tags\Tag
     }
 
     /** @return MorphToMany<Post> */
-    public function postsPublished(): MorphToMany
+    public function postsPublished($type = 'post'): MorphToMany
     {
         // @phpstan-ignore-next-line
-        return $this->morphedByMany(config('zeus-sky.models.Post'), 'taggable')->published();
+        return $this->morphedByMany(config('zeus-sky.models.Post'), 'taggable')->published($type);
     }
 
     protected function generateSlug(string $locale): string
