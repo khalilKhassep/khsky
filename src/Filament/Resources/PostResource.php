@@ -239,7 +239,7 @@ class PostResource extends SkyResource
 
 
                 ]),
-                Tabs\Tab::mak(__('Attachment'))
+                Tabs\Tab::make(__('Attachment'))
                 ->schema([
                     SpatieMediaLibraryFileUpload::make('attachments')
                     ->label(__('Attachments'))
