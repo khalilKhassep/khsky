@@ -356,6 +356,9 @@ class PostResource extends SkyResource
     {
         return __('Posts');
     }
+    public static function getPostType() :string {
+        return 'post';
+    }
 
     public static function getNavigationBadge(): ?string
     {

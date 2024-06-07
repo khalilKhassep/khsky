@@ -16,5 +16,5 @@ class CreateNavigation extends CreateRecord
 
     protected static string $resource = NavigationResource::class;
 
-    
+
 }

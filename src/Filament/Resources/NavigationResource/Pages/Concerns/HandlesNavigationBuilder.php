@@ -76,7 +76,7 @@ trait HandlesNavigationBuilder
         return [
             Action::make('item')
                 ->mountUsing(function (ComponentContainer $form) {
-                    if (! $this->mountedItem) {
+                    if (!$this->mountedItem) {
                         return;
                     }
 
@@ -84,9 +84,11 @@ trait HandlesNavigationBuilder
                 })
                 ->view('zeus::filament.hidden-action')
                 ->form([
-                    TextInput::make('label')
+                    TextInput::make('label_ar')
                         ->label(__('zeus-sky::filament-navigation.items-modal.label'))
                         ->required(),
+                    TextInput::make('label_en')
+                        ->label(__('Label English')),
                     Select::make('type')
                         ->label(__('zeus-sky::filament-navigation.items-modal.type'))
                         ->options(function () {
@@ -95,7 +97,7 @@ trait HandlesNavigationBuilder
                             return array_combine(array_keys($types), Arr::pluck($types, 'name'));
                         })
                         ->afterStateUpdated(function ($state, Select $component): void {
-                            if (! $state) {
+                            if (!$state) {
                                 return;
                             }
 

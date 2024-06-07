@@ -23,13 +23,13 @@
             <button
                 type="button"
                 wire:click="editItem('{{ $statePath }}')"
-                class="appearance-none px-3 py-2 ltr:text-left rtl:text-right"
+                class="px-3 py-2 appearance-none ltr:text-left rtl:text-right"
             >
                 <span>{{ $item['label'] }}</span>
             </button>
 
             @if(count($item['children']) > 0)
-                <button type="button" x-on:click="open = !open" title="Toggle children" class="appearance-none text-gray-500">
+                <button type="button" x-on:click="open = !open" title="Toggle children" class="text-gray-500 appearance-none">
                     <svg class="w-3.5 h-3.5 transition ease-in-out duration-200" x-bind:class="{
                         '-rotate-90': !open,
                     }" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd"></path></svg>

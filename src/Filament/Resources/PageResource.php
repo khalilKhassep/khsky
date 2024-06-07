@@ -37,6 +37,8 @@ use LaraZeus\Sky\Filament\Resources\PageResource\Pages;
 use Filament\Forms\Components\SpatieMediaLibraryFileUpload;
 use App\Models\Scopes\PanelScope;
 use Filament\Forms\Components\Toggle;
+use Illuminate\Database\Eloquent\Model;
+
 class PageResource extends SkyResource
 {
     protected static ?string $slug = 'pages';
@@ -76,7 +78,11 @@ class PageResource extends SkyResource
                             $set('slug', Str::slug($state));
                         }),
                     config('zeus-sky.editor')::component(),
-
+                     Select::make('gallary_id')
+                     ->label(__('Gallary'))
+                     ->relationship(name:'gallary',titleAttribute:'title')
+                     ->getOptionLabelFromRecordUsing(fn(?Model $record) => $record->title)
+                     ->preload(),
                     Select::make('google_form_id')
                         ->relationship(name: 'form', titleAttribute: 'name')
                         ->preload(),

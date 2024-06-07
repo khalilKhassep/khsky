@@ -46,9 +46,8 @@ class TagResource extends SkyResource
                             ->afterStateUpdated(function (Set $set, $state) {
                                 $slug = Str::slug($state);
                                 $tagModel = !is_null(SkyPlugin::get()->getModel('Tag')::findBySlug($slug, 'faq'))
-                                             ?SkyPlugin::get()->getModel('Tag')::findBySlug($slug, 'faq')->exists()
-                                             : false
-                                             ;
+                                    ? SkyPlugin::get()->getModel('Tag')::findBySlug($slug, 'faq')->exists()
+                                    : false;
                                 if ($tagModel) {
                                     $incementalslug = $state . '-' . SkyPlugin::get()->getModel('Tag')::where('slug', 'like', '%' . Str::slug($state) . '%')
                                         //->where('type', 'faq')
