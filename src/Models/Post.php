@@ -49,7 +49,8 @@ class Post extends Model implements HasMedia
         'title',
         'content',
         'description',
-       
+        //'post_meta'
+
     ];
 
     protected $fillable = [
@@ -72,7 +73,7 @@ class Post extends Model implements HasMedia
     protected $casts = [
         'published_at' => 'datetime',
         'sticky_until' => 'datetime',
-       
+
     ];
 
     protected static function newFactory(): PostFactory
