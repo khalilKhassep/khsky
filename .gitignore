@@ -20,3 +20,4 @@ yarn-error.log
 /pkg
 .DS_Store
 .phpactor.json
+/.history
