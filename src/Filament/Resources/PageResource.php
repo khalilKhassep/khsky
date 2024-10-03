@@ -37,6 +37,8 @@ use LaraZeus\Sky\Filament\Resources\PageResource\Pages;
 use Filament\Forms\Components\SpatieMediaLibraryFileUpload;
 use App\Models\Scopes\PanelScope;
 use Filament\Forms\Components\Toggle;
+use Illuminate\Database\Eloquent\Model;
+
 class PageResource extends SkyResource
 {
     protected static ?string $slug = 'pages';
@@ -76,7 +78,11 @@ class PageResource extends SkyResource
                             $set('slug', Str::slug($state));
                         }),
                     config('zeus-sky.editor')::component(),
-
+                     Select::make('gallary_id')
+                     ->label(__('Gallary'))
+                     ->relationship(name:'gallary',titleAttribute:'title')
+                     ->getOptionLabelFromRecordUsing(fn(?Model $record) => $record->title)
+                     ->preload(),
                     Select::make('google_form_id')
                         ->relationship(name: 'form', titleAttribute: 'name')
                         ->preload(),
@@ -157,11 +163,22 @@ class PageResource extends SkyResource
                         ->visible(fn (Get $get) => $get('featured_image_type') === 'url')
                         ->url(),
                 ]),
+                Tabs\Tab::make(__('Attachment'))
+                ->schema([
+                    SpatieMediaLibraryFileUpload::make('attachments')
+                    ->label(__('Attachments'))
+                    ->acceptedFileTypes(['application/msword','application/pdf' , 'text/plain'])
+                    ->multiple()
+                    ->preserveFilenames()
+                    ->collection('attachments')
+                    ->directory('attachments')
+                    ->dehydrated(false)
+                ])
             ])->columnSpan(2),
         ]);
     }
 
-    
+
     public static function table(Table $table): Table
     {
         return $table

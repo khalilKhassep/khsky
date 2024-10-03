@@ -63,13 +63,15 @@ class SkyServiceProvider extends PackageServiceProvider
 
     private function bootFilamentNavigation(): void
     {
+       
+
         Filament::serving(function () {
             if (! defined('__PHPSTAN_RUNNING__') &&
                 ! app('filament')->hasPlugin('zeus-sky')
             ) {
                 return;
             }
-
+           
             SkyPlugin::get()
                 ->itemType(
                     __('Post link'),
@@ -111,5 +113,8 @@ class SkyServiceProvider extends PackageServiceProvider
                     'library_link'
                 );
         });
+
+
+
     }
 }

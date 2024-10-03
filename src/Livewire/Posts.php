@@ -4,48 +4,48 @@ namespace LaraZeus\Sky\Livewire;
 
 use Illuminate\View\View;
 use Livewire\Component;
+use Livewire\WithPagination;
 
 class Posts extends Component
 {
     use SearchHelpers;
+    use WithPagination;
 
     public function render(): View
     {
-       // dd(isset(request()->query()['p']) && request()->query()['p'] == 'sommod');
+        // dd(isset(request()->query()['p']) && request()->query()['p'] == 'sommod');
         $type = null;
-        $load = false;
-        if(isset(request()->query()['p']) && request()->query()['p'] =='sommod') {
-            $load = true;
+        //$load = false;
+        if(isset(request()->query()['page'])) {
+            //$load = true;
             $type = preg_replace('([?].*)', '', request()->getRequestUri());
-        } 
-
-       
-
-        
-
+        }
         $search = request('search');
         $category = request('category');
         $type = str_replace('/', '', !is_null($type) ? $type : request()->getRequestUri());
-       
-        
-        if ($type === 'content' || $type == 'blog') 
+
+
+        if ($type === 'content' || $type == 'blog')
             $type = 'post';
-        
+
 
         $posts = config('zeus-sky.models.Post')::NotSticky($type)
-            ->sommod($load)
+            //->sommod($load)
+            //->pan()
             ->search($search)
             ->with(['tags', 'author', 'media'])
             ->type($type)
             ->forCategory($category)
             ->published($type)
             ->orderBy('published_at', 'desc')
+            //  ->paginate(10)
             ->get();
 
-      
+
+
 
         $pages = config('zeus-sky.models.Post')::query()
-            ->sommod($load)
+            //->sommod($load)
             ->page()
             ->whereDate('published_at', '<=', now())
             ->search($search)
@@ -59,7 +59,7 @@ class Posts extends Component
         $posts = $this->highlightSearchResults($posts, $search);
 
         $recent = config('zeus-sky.models.Post')::query()
-            ->sommod($load)
+            //->sommod($load)
             ->posts()
             ->published()
             ->whereDate('published_at', '<=', now())

@@ -6,6 +6,8 @@ use Filament\Actions\LocaleSwitcher;
 use Filament\Resources\Pages\CreateRecord;
 use LaraZeus\Sky\Filament\Resources\PostResource;
 use App\Traits\HasMultiablePanels;
+use Illuminate\Database\Eloquent\Model;
+
 class CreatePost extends CreateRecord
 {
     use CreateRecord\Concerns\Translatable,HasMultiablePanels{
@@ -20,6 +22,11 @@ class CreatePost extends CreateRecord
             LocaleSwitcher::make(),
         ];
     }
+
+
+   
+
+   
 
    
 }

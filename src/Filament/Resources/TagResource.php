@@ -44,7 +44,19 @@ class TagResource extends SkyResource
                             ->label(__('Tag.Name'))
                             ->live(onBlur: true)
                             ->afterStateUpdated(function (Set $set, $state) {
-                                $set('slug', Str::slug($state));
+                                $slug = Str::slug($state);
+                                $tagModel = !is_null(SkyPlugin::get()->getModel('Tag')::findBySlug($slug, 'faq'))
+                                    ? SkyPlugin::get()->getModel('Tag')::findBySlug($slug, 'faq')->exists()
+                                    : false;
+                                if ($tagModel) {
+                                    $incementalslug = $state . '-' . SkyPlugin::get()->getModel('Tag')::where('slug', 'like', '%' . Str::slug($state) . '%')
+                                        //->where('type', 'faq')
+                                        ->get()->count() + 1;
+
+                                    $set('slug', Str::slug($incementalslug));
+                                } else {
+                                    $set('slug', Str::slug($state));
+                                }
                             }),
                         TextInput::make('slug')
                             ->unique(ignorable: fn (?Model $record): ?Model => $record)
@@ -53,6 +65,15 @@ class TagResource extends SkyResource
                         Select::make('type')
                             ->columnSpan(2)
                             ->options(SkyPlugin::get()->getTagTypes()),
+                        Select::make('parent_id')
+                            ->relationship(name: 'parent', titleAttribute: "name")
+                            ->getOptionLabelFromRecordUsing(fn ($record) => $record->name)
+
+                            ->label(__('Parent')),
+                            Select::make(__('Panel'))
+                            ->multiple()
+                            ->preload()
+                            ->relationship('panels' , titleAttribute:'panel_name')
                     ]),
             ]);
     }
@@ -89,6 +110,13 @@ class TagResource extends SkyResource
             ->bulkActions([
                 DeleteBulkAction::make(),
             ]);
+    }
+
+    public static function getRelations(): array
+    {
+        return [
+            \App\Filament\Resources\TagResource\RelationManagers\ChildrenRelationManager::class
+        ];
     }
 
     public static function getPages(): array

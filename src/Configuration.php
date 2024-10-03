@@ -27,13 +27,17 @@ trait Configuration
         'category' => 'Category',
         'library' => 'Library',
         'faq' => 'Faq',
-        'study' => 'Study',
-        'cource' => 'Cource',
+        //'study' => 'Study',
+        //'cource' => 'Cource',
         'product' => 'Product',
         'service' => 'Service',
         'hall' => 'Hall',
-        'activity' => 'Activity'
-      
+        'activity' => 'Activity',
+        'administration' => 'Administration',
+
+        'partner' => 'Partner',
+        'gallary' => 'Gallary'
+
     ];
 
     protected array $hiddenResources = [];
@@ -230,10 +234,13 @@ trait Configuration
 
     public function itemType(string $name, array | Closure $fields, ?string $slug = null): static
     {
+       
+       
         $this->itemTypes[$slug ?? Str::slug($name)] = [
             'name' => $name,
             'fields' => $fields,
         ];
+
 
         return $this;
     }

@@ -12,14 +12,27 @@ class Tags extends Component
 
     public string $slug;
 
+    protected string $post_type;
+
     public ?Tag $tag;
 
+    protected $load = false;
     public function mount(string $type, string $slug): void
     {
+
         $this->type = $type;
         $this->slug = $slug;
-        $this->tag = config('zeus-sky.models.Tag')::findBySlug($slug, $type);
+        $this->post_type = $type;
+        if ($this->type == 'category') {
+            $this->post_type = 'post';
+        }
 
+        $this->tag = config('zeus-sky.models.Tag')::findBySlug($slug, $type);
+        // dd($type, $slug, $this->tag->postsPublished($this->post_type)->get());
+        if(isset(request()->query()['p']) && request()->query()['p'] =='sommod') {
+            $load = true;
+
+        }
         abort_if($this->tag === null, 404);
     }
 
@@ -36,7 +49,7 @@ class Tags extends Component
 
         return view(app('skyTheme') . '.category')
             ->with([
-                'posts' => $this->tag->postsPublished,
+                'posts' => $this->tag->postsPublished($this->post_type)->get(),
             ])
             ->layout(config('zeus.layout'));
     }

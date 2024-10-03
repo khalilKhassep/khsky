@@ -5,6 +5,7 @@ namespace LaraZeus\Sky\Models;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\MorphToMany;
+use Illuminate\Support\Facades\DB;
 
 /**
  * @property string $slug
@@ -37,10 +38,10 @@ class Tag extends \Spatie\Tags\Tag
     }
 
     /** @return MorphToMany<Post> */
-    public function postsPublished(): MorphToMany
+    public function postsPublished($type = 'post'): MorphToMany
     {
         // @phpstan-ignore-next-line
-        return $this->morphedByMany(config('zeus-sky.models.Post'), 'taggable')->published();
+        return $this->morphedByMany(config('zeus-sky.models.Post'), 'taggable')->published($type);
     }
 
     protected function generateSlug(string $locale): string
@@ -59,9 +60,9 @@ class Tag extends \Spatie\Tags\Tag
     public static function findBySlug(string $slug, ?string $type = null, ?string $locale = null): ?Model
     {
         $locale = $locale ?? static::getLocale();
-
+        
         return static::query()
-            ->where("slug->{$locale}", $slug)
+            ->where(DB::raw("json_unquote(json_extract(slug,\"$.$locale\"))"), $slug)
             ->where('type', $type)
             ->first();
     }

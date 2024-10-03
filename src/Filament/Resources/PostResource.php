@@ -55,6 +55,8 @@ class PostResource extends SkyResource
         return SkyPlugin::get()->getModel('Post');
     }
 
+
+
     public static function form(Form $form): Form
     {
         return $form->schema([
@@ -75,9 +77,9 @@ class PostResource extends SkyResource
                     config('zeus-sky.editor')::component()
                         ->label(__('Post Content')),
 
-                     Select::make('google_form_id')
-                     ->relationship(name:'form' , titleAttribute:'name')
-                     ->preload(),
+                    Select::make('google_form_id')
+                        ->relationship(name: 'form', titleAttribute: 'name')
+                        ->preload(),
 
                     Repeater::make('post_meta')
                         ->relationship()
@@ -168,7 +170,7 @@ class PostResource extends SkyResource
                         ->responsiveImages()
                         ->live()
                         ->manipulations([
-                            'thumb' => ['widht' => 300 , 'height' => 300]
+                            'thumb' => ['widht' => 300, 'height' => 300]
                         ])
                         ->disk(SkyPlugin::get()->getUploadDisk())
                         ->directory(SkyPlugin::get()->getUploadDirectory())
@@ -190,51 +192,60 @@ class PostResource extends SkyResource
                                 ->directory(SkyPlugin::get()->getUploadDirectory())
                                 ->live()
                                 ->afterStateHydrated(function ($state, ?\LaraZeus\Sky\Models\Post $record, Get $get, Set $set, string $operation) {
-                                    // state is null on create , empty array on edit 
-                                   // do clear thubnail collection when adding a custom thubnail 
-
+                                    // state is null on create , empty array on edit
+                                    // do clear thubnail collection when adding a custom thubnail
+                        
                                     $has_thmb = $get('has_thumb') === null ? false : $get('has_thumb');
 
-                                    // dd($state, $record);
+                                    if ($operation === 'edit') {
+                                    }
+                                    if ($operation === 'create') {
+                                    }
 
-                                    if($operation === 'edit') {}
-                                    if($operation === 'create'){}
+                                    if (is_null($state) || empty($state) && is_null($record) || !$has_thmb) {
 
-                                  
-
-                                    if(is_null($state) || empty($state) && is_null($record) || !$has_thmb) {
-                                       
                                         $has_thmb = $has_thmb;
                                     }
 
-                                    if(!is_null($state) && is_array($state) && !empty($state) && !$has_thmb) {
-                                      // has thumb
-                                    //      if(!is_null($record)) {
-                                    //         if($record->has_thumb) {
-                                    //             // get media url 
-                                    //             $media = $record->getMedia('posts')[0]->getPath('thumb-cropped-original');
-                                                
-                                               
-                                                
-                                    //         }
-                                    // }
-                                    
+                                    if (!is_null($state) && is_array($state) && !empty($state) && !$has_thmb) {
+                                        // has thumb
+                                        //      if(!is_null($record)) {
+                                        //         if($record->has_thumb) {
+                                        //             // get media url
+                                        //             $media = $record->getMedia('posts')[0]->getPath('thumb-cropped-original');
+                        
+
+
+                                        //         }
+                                        // }
+                        
                                         $has_thmb = true;
                                     }
 
                                     // dd($has_thmb);
-
-                                    $set('has_thumb', $has_thmb);
-                                    
-                                    //dd($state, $operation , $record);
-                        }),
-                        Checkbox::make('has_thumb')
-                        ->label('Has thmbnail')
-                        ->required()
-                    ])
-
                         
+                                    $set('has_thumb', $has_thmb);
+
+                                    //dd($state, $operation , $record);
+                                }),
+                            Checkbox::make('has_thumb')
+                                ->label('Has thmbnail')
+                                ->required()
+                        ])
+
+
                 ]),
+                Tabs\Tab::make(__('Attachment'))
+                    ->schema([
+                        SpatieMediaLibraryFileUpload::make('attachments')
+                            ->label(__('Attachments'))
+                            ->acceptedFileTypes(['application/msword', 'application/pdf', 'text/plain'])
+                            ->multiple()
+                            ->preserveFilenames()
+                            ->collection('attachments')
+                            ->directory('attachments')
+                            ->dehydrated(false)
+                    ])
             ])->columnSpan(2),
         ]);
     }
@@ -257,7 +268,7 @@ class PostResource extends SkyResource
                     ->searchable(['status'])
                     ->toggleable()
                     ->view('zeus::filament.columns.status-desc')
-                    ->tooltip(fn (Post $record): string => $record->published_at->format('Y/m/d | H:i A')),
+                    ->tooltip(fn(Post $record): string => $record->published_at->format('Y/m/d | H:i A')),
 
                 SpatieTagsColumn::make('tags')
                     ->label(__('Post Tags'))
@@ -288,17 +299,17 @@ class PostResource extends SkyResource
 
                 Filter::make('password')
                     ->label(__('Password Protected'))
-                    ->query(fn (Builder $query): Builder => $query->whereNotNull('password')),
+                    ->query(fn(Builder $query): Builder => $query->whereNotNull('password')),
 
                 Filter::make('sticky')
                     ->label(__('Still Sticky'))
                     // @phpstan-ignore-next-line
-                    ->query(fn (Builder $query): Builder => $query->sticky()),
+                    ->query(fn(Builder $query): Builder => $query->sticky()),
 
                 Filter::make('not_sticky')
                     ->label(__('Not Sticky'))
                     ->query(
-                        fn (Builder $query): Builder => $query
+                        fn(Builder $query): Builder => $query
                             ->whereDate('sticky_until', '<=', now())
                             ->orWhereNull('sticky_until')
                     ),
@@ -306,7 +317,7 @@ class PostResource extends SkyResource
                 Filter::make('sticky_only')
                     ->label(__('Sticky Only'))
                     ->query(
-                        fn (Builder $query): Builder => $query
+                        fn(Builder $query): Builder => $query
                             ->where('post_type', 'post')
                             ->whereNotNull('sticky_until')
                     ),
@@ -341,13 +352,18 @@ class PostResource extends SkyResource
     {
         return __('Posts');
     }
+    public static function getPostType(): string
+    {
+        return 'post';
+    }
 
     public static function getNavigationBadge(): ?string
     {
         return (string) SkyPlugin::get()->getModel('Post')::posts()->count();
     }
 
-    public static function getRelations(): array {
+    public static function getRelations(): array
+    {
         return [
             PostMetaRelationManager::class
         ];
@@ -361,7 +377,7 @@ class PostResource extends SkyResource
                 ->color('warning')
                 ->icon('heroicon-o-arrow-top-right-on-square')
                 ->label(__('Open'))
-                ->url(fn (Post $record): string => route('post', ['slug' => $record]))
+                ->url(fn(Post $record): string => route('post', ['slug' => $record]))
                 ->openUrlInNewTab(),
             DeleteAction::make('delete'),
             ForceDeleteAction::make(),
@@ -371,9 +387,11 @@ class PostResource extends SkyResource
         if (class_exists(\LaraZeus\Helen\HelenServiceProvider::class)) {
             //@phpstan-ignore-next-line
             $action[] = \LaraZeus\Helen\Actions\ShortUrlAction::make('get-link')
-                ->distUrl(fn (Post $record): string => route('post', ['slug' => $record]));
+                ->distUrl(fn(Post $record): string => route('post', ['slug' => $record]));
         }
 
         return [ActionGroup::make($action)];
     }
+
+
 }
