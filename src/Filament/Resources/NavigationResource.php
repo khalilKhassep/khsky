@@ -120,31 +120,32 @@ class NavigationResource extends SkyResource
                                  */
                                 $options = [
                                     'main-header-menu' => __('Header menu'),
-                                    'main-sommod-header-menu' => __('Header menu Sommod'),
+                                    // 'main-sommod-header-menu' => __('Header menu Sommod'),
                                     'footer-menu-1' => __('Footer 1'),
                                     'footer-menu-2' => __('Footer 2'),
                                     'footer-menu-3' => __('Footer 3'),
                                 ];
 
-                                $handles = array_values(static::getModel()::withoutGlobalScope(\App\Models\Scopes\PanelScope::class)->get()->pluck('handle')->toArray());
-
-                                $notUsedOptions = array_filter($options, function ($i) use ($options, $handles) {
-                                    $used = array_flip(array_diff(array_keys($options), $handles));
-                                    return array_key_exists($i, $used);
-
-                                }, ARRAY_FILTER_USE_KEY);
-
-                                if (is_null($record)) {
-                                    return $notUsedOptions;
-                                }
-                                return array_merge($notUsedOptions, [$record->handle => $record->name]);
-
+                                // $handles = array_values(static::getModel()::withoutGlobalScope(\App\Models\Scopes\PanelScope::class)->get()->pluck('handle')->toArray());
+                    
+                                // $notUsedOptions =  array_filter($options, function ($i) use ($options, $handles) {
+                                //     $used = array_flip(array_diff(array_keys($options), $handles));
+                                //     return array_key_exists($i, $used);
+                    
+                                // }, ARRAY_FILTER_USE_KEY);
+                    
+                                // if(is_null($record)){
+                                //     return $notUsedOptions;
+                                // }
+                                // return array_merge($notUsedOptions, [$record->handle => $record->name]); 
+                                return $options;
 
                             })
                             ->required(),
                         Select::make(__('Panel'))
                             ->multiple()
                             ->relationship('panels', titleAttribute: 'panel_name')
+                            ->required()
                             ->preload(),
                         //->unique(column: 'handle', ignoreRecord: true),
                         View::make('zeus::filament.card-divider')
