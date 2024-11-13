@@ -27,14 +27,11 @@ trait Configuration
         'category' => 'Category',
         'library' => 'Library',
         'faq' => 'Faq',
-        //'study' => 'Study',
-        //'cource' => 'Cource',
         'product' => 'Product',
         'service' => 'Service',
         'hall' => 'Hall',
         'activity' => 'Activity',
         'administration' => 'Administration',
-
         'partner' => 'Partner',
         'gallary' => 'Gallary'
 
@@ -294,3 +291,4 @@ trait Configuration
         return $this;
     }
 }
+    

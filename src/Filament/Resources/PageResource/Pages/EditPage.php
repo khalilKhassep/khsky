@@ -8,7 +8,8 @@ use LaraZeus\Sky\Filament\Resources\PageResource;
 
 class EditPage extends EditRecord
 {
-    use EditRecord\Concerns\Translatable;
+    use EditRecord\Concerns\Translatable,
+        \App\Traits\EditResourceHasPanels;
 
     protected static string $resource = PageResource::class;
 

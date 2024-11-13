@@ -67,7 +67,8 @@ class Post extends Model implements HasMedia
         'password',
         'ordering',
         'status',
-        'has_thumb'
+        'has_thumb',
+        'has_contact_form'
     ];
 
     protected $casts = [

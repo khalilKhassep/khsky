@@ -5,6 +5,8 @@ namespace LaraZeus\Sky\Livewire;
 use Illuminate\View\View;
 use Livewire\Component;
 use Livewire\WithPagination;
+use App\Models\Scopes\PanelScope;
+use App\Models\Scopes\ContentProviderScope;
 
 class Posts extends Component
 {
@@ -13,7 +15,6 @@ class Posts extends Component
 
     public function render(): View
     {
-        // dd(isset(request()->query()['p']) && request()->query()['p'] == 'sommod');
         $type = null;
         //$load = false;
         if(isset(request()->query()['page'])) {
@@ -28,17 +29,20 @@ class Posts extends Component
         if ($type === 'content' || $type == 'blog')
             $type = 'post';
 
-
-        $posts = config('zeus-sky.models.Post')::NotSticky($type)
-            //->sommod($load)
-            //->pan()
+        
+           $posts = config('zeus-sky.models.Post')::NotSticky($type) ;
+        // dd(session()->all());
+           if(session()->has('council_load')) {
+              $posts->withoutGlobalScopes(); 
+           } 
+           $posts = $posts 
             ->search($search)
             ->with(['tags', 'author', 'media'])
             ->type($type)
             ->forCategory($category)
             ->published($type)
             ->orderBy('published_at', 'desc')
-            //  ->paginate(10)
+            
             ->get();
 
 

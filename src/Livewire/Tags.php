@@ -4,6 +4,7 @@ namespace LaraZeus\Sky\Livewire;
 
 use Illuminate\View\View;
 use LaraZeus\Sky\Models\Tag;
+use LaraZeus\Sky\SkyPlugin;
 use Livewire\Component;
 
 class Tags extends Component
@@ -14,25 +15,28 @@ class Tags extends Component
 
     protected string $post_type;
 
+    protected ?string $template = 'default';
     public ?Tag $tag;
 
     protected $load = false;
     public function mount(string $type, string $slug): void
     {
-
         $this->type = $type;
         $this->slug = $slug;
         $this->post_type = $type;
+
+         
+
         if ($this->type == 'category') {
             $this->post_type = 'post';
         }
 
+       
         $this->tag = config('zeus-sky.models.Tag')::findBySlug($slug, $type);
-        // dd($type, $slug, $this->tag->postsPublished($this->post_type)->get());
-        if(isset(request()->query()['p']) && request()->query()['p'] =='sommod') {
-            $load = true;
 
-        }
+        filled($this->tag->template) ? $this->template = $this->tag->template : '';
+
+        
         abort_if($this->tag === null, 404);
     }
 
@@ -47,7 +51,7 @@ class Tags extends Component
             ->withUrl()
             ->twitter();
 
-        return view(app('skyTheme') . '.category')
+        return view(app('skyTheme') . '.partial.templates.tag-'.$this->template)
             ->with([
                 'posts' => $this->tag->postsPublished($this->post_type)->get(),
             ])

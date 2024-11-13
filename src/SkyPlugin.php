@@ -47,7 +47,7 @@ final class SkyPlugin implements Plugin
 
         if ($this->hasNavigationResource()) {
             $panel->resources([NavigationResource::class]);
-            // dd(static::get()->getItemTypes());
+          
 
         }
     }
@@ -65,43 +65,6 @@ final class SkyPlugin implements Plugin
 
     public function boot(Panel $panel): void
     {
-        // $this->itemType(__('Catoery'), [
-        //     Select::make('category_id')
-        //         ->searchable()
-        //         ->options(function () {
-        //             return SkyPlugin::get()->getModel('Tag')::whereIn('type', SkyPlugin::get()->getModel('Tag')::getTypes())->pluck('name', 'id')->map(fn($tag) => preg_replace('/\n/', '', $tag));
-        //         })
-        // ], 'category');
-
-        // $this->itemType(__('Sommod Routes'), [
-        //     Select::make('sommod_routes')
-        //         ->label(__('Sommod Routes'))
-        //         ->options([
-        //             'front.somoud.home' => __('Somoud Home'),
-        //         ])
-        // ]);
-
-        // $this->itemType(__('Collection'), [
-        //     Select::make('collection')
-        //         ->searchable()
-        //         ->options(function () {
-        //             return [
-        //                 'event' => __('Events'),
-        //                 'activity' => __('Activities'),
-        //                 'administration' => __('Administrations'),
-        //                 'hall' => __('Halls'),
-        //                 'partners' => __('Partners'),
-        //                 'product' => __('Products'),
-        //                 'service' => __('Services'),
-        //                 'supporters' => __('Supporters'),
-        //                 'cource' => __('Cources'),
-        //                 'initiative' => __('Initiatives'),
-        //                 'blogs' => __('All News'),
-        //                 'dashboard' => __('Library'),
-        //                 'faq' => __('Faqs'),
-
-        //             ];
-        //         })
-        // ], 'collection');
+       
     }
 }

@@ -11,9 +11,16 @@ class Post extends Component
 
     public function mount(string $slug): void
     {
-        $this->post = config('zeus-sky.models.Post')::where('slug', $slug)->firstOrFail();
-    }
 
+        $postQeury = config('zeus-sky.models.Post')::where('slug', $slug);
+        if(session()->has('council_load') && session()->get('council_load') === true) {
+            
+            $postQeury->withoutGlobalScopes();
+        }
+        
+        $this->post =$postQeury->firstOrFail();
+        
+    } 
     public function render(): View
     {
         $this->setSeo();
@@ -22,6 +29,8 @@ class Post extends Component
             abort_if(! auth()->check(), 404);
             abort_if($this->post->user_id !== auth()->user()->id, 401);
         }
+
+        
 
         if ($this->post->require_password && ! session()->has($this->post->slug . '-' . $this->post->password)) {
             return view(app('skyTheme') . '.partial.password-form')

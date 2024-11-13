@@ -41,7 +41,7 @@ class TagResource extends SkyResource
                         TextInput::make('name')
                             ->required()
                             ->maxLength(255)
-                            ->label(__('Tag.Name'))
+                            ->label(__('Tag Name'))
                             ->live(onBlur: true)
                             ->afterStateUpdated(function (Set $set, $state) {
                                 $slug = Str::slug($state);
@@ -59,27 +59,33 @@ class TagResource extends SkyResource
                                 }
                             }),
                         TextInput::make('slug')
-                            ->unique(ignorable: fn (?Model $record): ?Model => $record)
+                            ->unique(ignorable: fn(?Model $record): ?Model => $record)
                             ->required()
                             ->maxLength(255),
                         Select::make('type')
                             ->columnSpan(2)
                             ->options(SkyPlugin::get()->getTagTypes()),
+                        Select::make('template')
+                            ->options([
+                                'default' => 'default',
+                                'members' => 'members'
+                            ]),
                         Select::make('parent_id')
                             ->relationship(name: 'parent', titleAttribute: "name")
-                            ->getOptionLabelFromRecordUsing(fn ($record) => $record->name)
+                            ->getOptionLabelFromRecordUsing(fn($record) => $record->name)
 
                             ->label(__('Parent')),
-                            Select::make(__('Panel'))
+                        Select::make(__('Panel'))
                             ->multiple()
                             ->preload()
-                            ->relationship('panels' , titleAttribute:'panel_name')
+                            ->relationship('panels', titleAttribute: 'panel_name')
                     ]),
             ]);
     }
 
     public static function table(Table $table): Table
     {
+
         return $table
             ->columns([
                 TextColumn::make('name')->toggleable()->searchable()->sortable(),
@@ -88,9 +94,21 @@ class TagResource extends SkyResource
                 TextColumn::make('items_count')
                     ->toggleable()
                     ->getStateUsing(
-                        fn (Tag $record): int => method_exists($record, $record->type)
-                            ? $record->{$record->type}()->count()
-                            : 0
+                        function (Tag $record): int {
+                            // get class methods
+                
+                            $methods = get_class_methods($record);
+
+                            if (in_array($record->type, $methods))
+                                return $record->{$record->type}->count();
+
+                            if (in_array($record->type, config('zeus-sky.tags_type')))
+                                return $record->category()->count();
+
+                            return 0;
+
+                        }
+
                     ),
                 TextColumn::make('panels.panel_name')
                     ->label(__('Panel')),

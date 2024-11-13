@@ -8,7 +8,8 @@ use LaraZeus\Sky\Filament\Resources\FaqResource;
 
 class EditFaq extends EditRecord
 {
-    use EditRecord\Concerns\Translatable;
+    use EditRecord\Concerns\Translatable,
+        \App\Traits\EditResourceHasPanels;
 
     protected static string $resource = FaqResource::class;
 

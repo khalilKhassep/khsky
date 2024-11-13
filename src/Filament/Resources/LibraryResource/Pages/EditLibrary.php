@@ -8,7 +8,8 @@ use LaraZeus\Sky\Filament\Resources\LibraryResource;
 
 class EditLibrary extends EditRecord
 {
-    use EditRecord\Concerns\Translatable;
+    use EditRecord\Concerns\Translatable,
+        \App\Traits\EditResourceHasPanels;
 
     protected static string $resource = LibraryResource::class;
 

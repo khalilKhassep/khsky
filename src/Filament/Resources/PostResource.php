@@ -43,6 +43,8 @@ use LaraZeus\Sky\SkyPlugin;
 use Filament\Tables\Columns\TextColumn;
 use Guava\FilamentIconPicker\Forms\IconPicker;
 use App\Filament\Resources\PostResource\RelationManagers\PostMetaRelationManager;
+use Illuminate\Database\Eloquent\Model;
+
 // @mixin Builder<PostScope>
 class PostResource extends SkyResource
 {
@@ -77,8 +79,18 @@ class PostResource extends SkyResource
                     config('zeus-sky.editor')::component()
                         ->label(__('Post Content')),
 
+                    Toggle::make('has_contact_form')
+                    ->label(__('Enable Contact form')), 
+                       
+
                     Select::make('google_form_id')
                         ->relationship(name: 'form', titleAttribute: 'name')
+                        ->preload(),
+
+                    Select::make('gallary_id')
+                        ->label(__('Gallary'))
+                        ->relationship(name: 'gallary', titleAttribute: 'title')
+                        ->getOptionLabelFromRecordUsing(fn(?Model $record) => $record->title)
                         ->preload(),
 
                     Repeater::make('post_meta')
@@ -167,13 +179,13 @@ class PostResource extends SkyResource
                         ->default('upload'),
                     SpatieMediaLibraryFileUpload::make('featured_image_upload')
                         ->collection('posts')
+                        ->disk(SkyPlugin::get()->getUploadDisk())
+                        ->directory(SkyPlugin::get()->getUploadDirectory())
                         ->responsiveImages()
                         ->live()
                         ->manipulations([
                             'thumb' => ['widht' => 300, 'height' => 300]
                         ])
-                        ->disk(SkyPlugin::get()->getUploadDisk())
-                        ->directory(SkyPlugin::get()->getUploadDirectory())
                         ->visible(fn(Get $get) => $get('featured_image_type') === 'upload')
                         ->label(''),
 
@@ -192,45 +204,54 @@ class PostResource extends SkyResource
                                 ->directory(SkyPlugin::get()->getUploadDirectory())
                                 ->live()
                                 ->afterStateHydrated(function ($state, ?\LaraZeus\Sky\Models\Post $record, Get $get, Set $set, string $operation) {
-                                    // state is null on create , empty array on edit
-                                    // do clear thubnail collection when adding a custom thubnail
-                        
-                                    $has_thmb = $get('has_thumb') === null ? false : $get('has_thumb');
+                                    // Retrieve the current 'has_thumb' state or set it to false if null
+                                    $hasThumb = $get('has_thumb') ?? false;
 
-                                    if ($operation === 'edit') {
-                                    }
-                                    if ($operation === 'create') {
+                                    // If state is null or empty (on create) and no record or thumbnail, keep 'has_thumb' unchanged
+                                    if ((is_null($state) || empty($state)) && (is_null($record) || !$hasThumb)) {
+                                        // No need to change $hasThumb, it stays as is
                                     }
 
-                                    if (is_null($state) || empty($state) && is_null($record) || !$has_thmb) {
-
-                                        $has_thmb = $has_thmb;
+                                    // If state is populated (on edit) and no custom thumbnail has been set, enable 'has_thumb'
+                                    if (!is_null($state) && is_array($state) && !empty($state) && !$hasThumb) {
+                                        $hasThumb = true;
                                     }
 
-                                    if (!is_null($state) && is_array($state) && !empty($state) && !$has_thmb) {
-                                        // has thumb
-                                        //      if(!is_null($record)) {
-                                        //         if($record->has_thumb) {
-                                        //             // get media url
-                                        //             $media = $record->getMedia('posts')[0]->getPath('thumb-cropped-original');
-                        
+                                    // Update the 'has_thumb' value in the form state
+                                    $set('has_thumb', $hasThumb);
 
-
-                                        //         }
-                                        // }
-                        
-                                        $has_thmb = true;
-                                    }
-
-                                    // dd($has_thmb);
-                        
-                                    $set('has_thumb', $has_thmb);
-
-                                    //dd($state, $operation , $record);
                                 }),
                             Checkbox::make('has_thumb')
                                 ->label('Has thmbnail')
                                 ->required()
+                        ]),
+
+                        Section::make('cover_image')
+                            ->label(__('Cover'))
+                            ->schema([
+                                \Filament\Forms\Components\Fieldset::make('Cover Info')
+                                    ->relationship('coverInfo')
+                                    ->schema([
+                                        TextInput::make('title')
+                                            ->label(__('Title')),
+                                            //->required(),
+                                        TextInput::make('source')
+                                            ->label(__('Source'))
+                                            ->url(),
+                                        Textarea::make('description')
+                                            ->label(__('Description'))
+                                            ->columnSpanFull(),
+                                        
+                                        SpatieMediaLibraryFileUpload::make('cover')
+                                            ->collection('cover')
+                                            ->disk(SkyPlugin::get()->getUploadDisk())
+                                            ->directory(SkyPlugin::get()->getUploadDirectory())
+                                            ->columnSpanFull()
+                                    ]),
+                                // SpatieMediaLibraryFileUpload::make('post_cover')
+                            //     ->collection('post_cover')
+                            //     ->disk(SkyPlugin::get()->getUploadDisk())
+                            //     ->directory(SkyPlugin::get()->getUploadDirectory())
                         ])
 
 
@@ -340,17 +361,17 @@ class PostResource extends SkyResource
 
     public static function getLabel(): string
     {
-        return __('Post');
+        return __('News');
     }
 
     public static function getPluralLabel(): string
     {
-        return __('Posts');
+        return __('News');
     }
 
     public static function getNavigationLabel(): string
     {
-        return __('Posts');
+        return __('News');
     }
     public static function getPostType(): string
     {

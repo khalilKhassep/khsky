@@ -2,9 +2,11 @@
 
 namespace LaraZeus\Sky\Filament\Resources;
 
+use App\Classes\ContentProvider;
 use Filament\Forms\Get;
 use Filament\Forms\Set;
 use Filament\Forms\Form;
+use Filament\PanelProvider;
 use Filament\Tables\Table;
 use Illuminate\Support\Str;
 use LaraZeus\Sky\SkyPlugin;
@@ -38,6 +40,7 @@ use Filament\Forms\Components\SpatieMediaLibraryFileUpload;
 use App\Models\Scopes\PanelScope;
 use Filament\Forms\Components\Toggle;
 use Illuminate\Database\Eloquent\Model;
+use Filament\Forms\Components\Section;
 
 class PageResource extends SkyResource
 {
@@ -78,14 +81,22 @@ class PageResource extends SkyResource
                             $set('slug', Str::slug($state));
                         }),
                     config('zeus-sky.editor')::component(),
-                     Select::make('gallary_id')
-                     ->label(__('Gallary'))
-                     ->relationship(name:'gallary',titleAttribute:'title')
-                     ->getOptionLabelFromRecordUsing(fn(?Model $record) => $record->title)
-                     ->preload(),
+                    Toggle::make('has_contact_form')
+                        ->label(__('Enable Contact form')),
+
+                    Select::make('gallary_id')
+                        ->label(__('Gallary'))
+                        ->relationship(name: 'gallary', titleAttribute: 'title')
+                        ->getOptionLabelFromRecordUsing(fn(?Model $record) => $record->title)
+                        ->preload(),
                     Select::make('google_form_id')
                         ->relationship(name: 'form', titleAttribute: 'name')
                         ->preload(),
+                    Select::make('panels')
+                        ->relationship('panels', titleAttribute: 'panel_name')
+                        ->preload()
+                        ->multiple()
+
                 ]),
                 Tabs\Tab::make(__('SEO'))->schema([
                     Hidden::make('user_id')
@@ -102,7 +113,7 @@ class PageResource extends SkyResource
                         ->hint(__('Write an excerpt for your post')),
 
                     TextInput::make('slug')
-                        ->unique(ignorable: fn (?Post $record): ?Post => $record)
+                        ->unique(ignorable: fn(?Post $record): ?Post => $record)
                         ->required()
                         ->maxLength(255)
                         ->label(__('Post Slug')),
@@ -129,7 +140,7 @@ class PageResource extends SkyResource
 
                     TextInput::make('password')
                         ->label(__('Password'))
-                        ->visible(fn (Get $get): bool => $get('status') === 'private'),
+                        ->visible(fn(Get $get): bool => $get('status') === 'private'),
 
                     DateTimePicker::make('published_at')
                         ->label(__('published at'))
@@ -155,25 +166,52 @@ class PageResource extends SkyResource
                     SpatieMediaLibraryFileUpload::make('featured_image_upload')
                         ->collection('pages')
                         ->disk(SkyPlugin::get()->getUploadDisk())
-                        ->directory(SkyPlugin::get()->getUploadDirectory().'kh')
-                        ->visible(fn (Get $get) => $get('featured_image_type') === 'upload')
+                        ->directory(SkyPlugin::get()->getUploadDirectory())
+                        ->visible(fn(Get $get) => $get('featured_image_type') === 'upload')
                         ->label(''),
                     TextInput::make('featured_image')
                         ->label(__('featured image url'))
-                        ->visible(fn (Get $get) => $get('featured_image_type') === 'url')
+                        ->visible(fn(Get $get) => $get('featured_image_type') === 'url')
                         ->url(),
+                    Section::make('cover_image')
+                        ->label(__('Cover'))
+                        ->schema([
+                            \Filament\Forms\Components\Fieldset::make('Cover Info')
+                                ->relationship('coverInfo')
+                                ->schema([
+                                    TextInput::make('title')
+                                        ->label(__('Title'))
+                                        ->required(),
+                                    TextInput::make('source')
+                                        ->label(__('Source'))
+                                        ->url(),
+                                    Textarea::make('description')
+                                        ->label(__('Description'))
+                                        ->columnSpanFull(),
+
+                                    SpatieMediaLibraryFileUpload::make('cover')
+                                        ->collection('cover')
+                                        ->disk(SkyPlugin::get()->getUploadDisk())
+                                        ->directory(SkyPlugin::get()->getUploadDirectory())
+                                        ->columnSpanFull()
+                                ]),
+                            // SpatieMediaLibraryFileUpload::make('post_cover')
+                            //     ->collection('post_cover')
+                            //     ->disk(SkyPlugin::get()->getUploadDisk())
+                            //     ->directory(SkyPlugin::get()->getUploadDirectory())
+                        ])
                 ]),
                 Tabs\Tab::make(__('Attachment'))
-                ->schema([
-                    SpatieMediaLibraryFileUpload::make('attachments')
-                    ->label(__('Attachments'))
-                    ->acceptedFileTypes(['application/msword','application/pdf' , 'text/plain'])
-                    ->multiple()
-                    ->preserveFilenames()
-                    ->collection('attachments')
-                    ->directory('attachments')
-                    ->dehydrated(false)
-                ])
+                    ->schema([
+                        SpatieMediaLibraryFileUpload::make('attachments')
+                            ->label(__('Attachments'))
+                            ->acceptedFileTypes(['application/msword', 'application/pdf', 'text/plain'])
+                            ->multiple()
+                            ->preserveFilenames()
+                            ->collection('attachments')
+                            ->directory('attachments')
+                            ->dehydrated(false)
+                    ])
             ])->columnSpan(2),
         ]);
     }
@@ -196,7 +234,7 @@ class PageResource extends SkyResource
                     ->searchable(['status'])
                     ->toggleable()
                     ->view('zeus::filament.columns.status-desc')
-                    ->tooltip(fn (Post $record): string => $record->published_at->format('Y/m/d | H:i A')),
+                    ->tooltip(fn(Post $record): string => $record->published_at->format('Y/m/d | H:i A')),
                 TextColumn::make('panels.panel_name')
                     ->label(__('Panel')),
 
@@ -216,7 +254,7 @@ class PageResource extends SkyResource
                     ->options(SkyPlugin::get()->getModel('PostStatus')::pluck('label', 'name')),
                 Filter::make('password')
                     ->label(__('Password Protected'))
-                    ->query(fn (Builder $query): Builder => $query->whereNotNull('password')),
+                    ->query(fn(Builder $query): Builder => $query->whereNotNull('password')),
             ]);
     }
 
@@ -257,7 +295,7 @@ class PageResource extends SkyResource
                 ->color('warning')
                 ->icon('heroicon-o-arrow-top-right-on-square')
                 ->label(__('Open'))
-                ->url(fn (Post $record): string => route('page', ['slug' => $record]))
+                ->url(fn(Post $record): string => route('page', ['slug' => $record]))
                 ->openUrlInNewTab(),
             DeleteAction::make('delete'),
             ForceDeleteAction::make(),
@@ -267,7 +305,7 @@ class PageResource extends SkyResource
         if (class_exists(\LaraZeus\Helen\HelenServiceProvider::class)) {
             //@phpstan-ignore-next-line
             $action[] = \LaraZeus\Helen\Actions\ShortUrlAction::make('get-link')
-                ->distUrl(fn (Post $record): string => route('page', ['slug' => $record]));
+                ->distUrl(fn(Post $record): string => route('page', ['slug' => $record]));
         }
 
         return [ActionGroup::make($action)];

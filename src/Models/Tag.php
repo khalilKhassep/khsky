@@ -14,7 +14,7 @@ use Illuminate\Support\Facades\DB;
  * @property string $description
  *
  * @method Builder|static published()
- */
+     */
 class Tag extends \Spatie\Tags\Tag
 {
     public function library(): MorphToMany
@@ -26,6 +26,7 @@ class Tag extends \Spatie\Tags\Tag
     {
         return $this->morphedByMany(config('zeus-sky.models.Post'), 'taggable');
     }
+
 
     public function faq(): MorphToMany
     {

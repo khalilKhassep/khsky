@@ -8,7 +8,8 @@ use LaraZeus\Sky\Filament\Resources\PostResource;
 
 class EditPost extends EditRecord
 {
-    use EditRecord\Concerns\Translatable;
+    use EditRecord\Concerns\Translatable,
+        \App\Traits\EditResourceHasPanels;
 
     protected static string $resource = PostResource::class;
 
